@@ -14,16 +14,28 @@ CanManager can;
 #define DC_2_IN2 PA2
 
 void set_motor(can_frame_t frame) {
-    MOTEUR msg;
+    MOTOR msg;
     memcpy(&msg, frame.data, frame.length);
     
     uint32_t pin_in1;
     uint32_t pin_in2;
 
-    if (msg.motor_id == RIGHT) {
+    if (msg.motor_id == BOTH) {
+        if (!msg.etat && !msg.forward){ // stopper
+            analogWrite(DC_1_IN1, 0);
+            analogWrite(DC_1_IN2, 0);
+            analogWrite(DC_2_IN1, 0);
+            analogWrite(DC_2_IN2, 0);
+            digitalWrite(DC_1_IN1, LOW);
+            digitalWrite(DC_1_IN2, LOW);
+            digitalWrite(DC_2_IN1, LOW);
+            digitalWrite(DC_2_IN2, LOW);
+        }
+    }
+    else if (msg.motor_id == RIGHT) {
         pin_in1 = DC_1_IN1;
         pin_in2 = DC_1_IN2;
-    } else {
+    }  else {
         pin_in1 = DC_2_IN1;
         pin_in2 = DC_2_IN2;
     }
@@ -66,7 +78,7 @@ void setup() {
     digitalWrite(DC_2_IN2, LOW);
 
     can.init();
-    can.onReceive(MOTEUR::ID, set_motor);
+    can.onReceive(MOTOR::ID, set_motor);
 }
 
 void loop() {
