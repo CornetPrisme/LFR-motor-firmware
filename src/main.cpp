@@ -19,42 +19,61 @@ void set_motor(can_frame_t frame) {
     
     uint32_t pin_in1;
     uint32_t pin_in2;
-
-    if (msg.motor_id == BOTH) {
-        if (!msg.etat && !msg.forward){ // stopper
-            analogWrite(DC_1_IN1, 0);
-            analogWrite(DC_1_IN2, 0);
-            analogWrite(DC_2_IN1, 0);
-            analogWrite(DC_2_IN2, 0);
-            digitalWrite(DC_1_IN1, LOW);
-            digitalWrite(DC_1_IN2, LOW);
-            digitalWrite(DC_2_IN1, LOW);
-            digitalWrite(DC_2_IN2, LOW);
-        }
-    }
-    else if (msg.motor_id == RIGHT) {
-        pin_in1 = DC_1_IN1;
-        pin_in2 = DC_1_IN2;
-    }  else {
-        pin_in1 = DC_2_IN1;
-        pin_in2 = DC_2_IN2;
-    }
-
-    if (msg.speed == 0) {
-        analogWrite(pin_in1, 0);
-        analogWrite(pin_in2, 0);
-        digitalWrite(pin_in1, LOW);
-        digitalWrite(pin_in2, LOW);
+    
+    if (msg.launch) {
+        digitalWrite(DC_1_IN2, LOW);
+        analogWrite(DC_1_IN1, 255);
+        delay(3000);
+        
+        analogWrite(DC_1_IN1, 0);
+        digitalWrite(DC_1_IN1, LOW);
+        delay(1000);
+        
+        digitalWrite(DC_2_IN2, LOW);
+        analogWrite(DC_2_IN1, 255);
+        delay(3000);
+        
+        
+        analogWrite(DC_2_IN1, 0);
+        digitalWrite(DC_2_IN1, LOW);
         return;
     }
 
-    if (msg.etat) {
-        digitalWrite(pin_in2, LOW);         
-        analogWrite(pin_in1, msg.speed);
-    } 
-    else {
-        digitalWrite(pin_in1, LOW);
-        analogWrite(pin_in2, msg.speed);
+    if (msg.speed == 0){ // stop
+        analogWrite(DC_1_IN1, 0);
+        analogWrite(DC_1_IN2, 0);
+        analogWrite(DC_2_IN1, 0);
+        analogWrite(DC_2_IN2, 0);
+        digitalWrite(DC_1_IN1, LOW);
+        digitalWrite(DC_1_IN2, LOW);
+        digitalWrite(DC_2_IN1, LOW);
+        digitalWrite(DC_2_IN2, LOW);
+    }
+    
+    int abs_speed = abs(msg.speed);
+    
+    if (abs_speed > 255) {
+        abs_speed = 255;
+    }
+
+    if (msg.motor_id == BOTH || msg.motor_id == RIGHT) {
+        if (msg.speed > 0) {
+            digitalWrite(DC_1_IN2, LOW);         
+            analogWrite(DC_1_IN1, abs_speed);
+        } else if (msg.speed < 0) {
+            digitalWrite(DC_1_IN1, LOW);
+            analogWrite(DC_1_IN2, abs_speed);
+        }
+    }
+    
+    if (msg.motor_id == BOTH || msg.motor_id == LEFT) {
+        if (msg.speed > 0) {
+            digitalWrite(DC_2_IN2, LOW);         
+            analogWrite(DC_2_IN1, abs_speed);
+        } else if (msg.speed < 0) {
+            digitalWrite(DC_2_IN1, LOW);
+            analogWrite(DC_2_IN2, abs_speed);
+        }
     }
 }
 

@@ -8,42 +8,19 @@ MotorDriver::MotorDriver(CanManager* can_manager, motor_id_t id) {
     this->motor_id = id;
 }
 
-void MotorDriver::avancer(uint8_t speed) {
+void MotorDriver::set_speed(uint8_t speed) {
     MOTOR cmd; 
     cmd.motor_id = this->motor_id;
-    cmd.etat = true;
-    cmd.forward = true;
+    cmd.launch = false;
     cmd.speed = speed;
 
     this->can->send(cmd);
 }
 
-void MotorDriver::reculer(uint8_t speed) {
-    MOTOR cmd;
-    cmd.motor_id = this->motor_id;
-    cmd.etat = true;
-    cmd.forward = false;
-    cmd.speed = speed;
-
-    this->can->send(cmd); 
-}
-
-void MotorDriver::stopper() {
-    MOTOR cmd;
-    cmd.motor_id = this->motor_id;
-    cmd.etat = false;
-    cmd.forward = false;
-    cmd.speed = 0;
-
-    this->can->send(cmd); 
-}
-
 void MotorDriver::init() {
-    MOTOR cmd;
+    MOTOR cmd; 
     cmd.motor_id = this->motor_id;
-    cmd.etat = false;
-    cmd.forward = true;
-    cmd.speed = 0;
+    cmd.launch = true;
 
     this->can->send(cmd);
 }

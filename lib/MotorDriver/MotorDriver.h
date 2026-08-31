@@ -10,7 +10,5 @@ class MotorDriver {
         MotorDriver(CanManager* can_manager, motor_id_t id);
 
         void init();
-        void avancer(uint8_t speed);
-        void reculer(uint8_t speed);
-        void stopper();
+        void set_speed(int16_t speed);
 };
