@@ -8,7 +8,7 @@ MotorDriver::MotorDriver(CanManager* can_manager, motor_id_t id) {
     this->motor_id = id;
 }
 
-void MotorDriver::set_speed(uint8_t speed) {
+void MotorDriver::set_speed(int16_t speed) {
     MOTOR cmd; 
     cmd.motor_id = this->motor_id;
     cmd.launch = false;
