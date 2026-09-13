@@ -17,9 +17,7 @@ void set_motor(can_frame_t frame) {
     MOTOR msg;
     memcpy(&msg, frame.data, frame.length);
     
-    uint32_t pin_in1;
-    uint32_t pin_in2;
-    
+    // INIT
     if (msg.launch) {
         digitalWrite(DC_1_IN2, LOW);
         analogWrite(DC_1_IN1, 255);
@@ -33,46 +31,45 @@ void set_motor(can_frame_t frame) {
         analogWrite(DC_2_IN1, 255);
         delay(3000);
         
-        
         analogWrite(DC_2_IN1, 0);
         digitalWrite(DC_2_IN1, LOW);
         return;
     }
-
-    if (msg.speed == 0){ // stop
-        analogWrite(DC_1_IN1, 0);
-        analogWrite(DC_1_IN2, 0);
-        analogWrite(DC_2_IN1, 0);
-        analogWrite(DC_2_IN2, 0);
-        digitalWrite(DC_1_IN1, LOW);
-        digitalWrite(DC_1_IN2, LOW);
-        digitalWrite(DC_2_IN1, LOW);
-        digitalWrite(DC_2_IN2, LOW);
-    }
     
     int abs_speed = abs(msg.speed);
-    
     if (abs_speed > 255) {
         abs_speed = 255;
     }
 
+    // RIGHT
     if (msg.motor_id == BOTH || msg.motor_id == RIGHT) {
-        if (msg.speed > 0) {
+        if (msg.speed > 0) { // Marche avant
             digitalWrite(DC_1_IN2, LOW);         
             analogWrite(DC_1_IN1, abs_speed);
-        } else if (msg.speed < 0) {
+        } else if (msg.speed < 0) { // Marche arrière
             digitalWrite(DC_1_IN1, LOW);
             analogWrite(DC_1_IN2, abs_speed);
+        } else { // Arrêt
+            analogWrite(DC_1_IN1, 0);
+            analogWrite(DC_1_IN2, 0);
+            digitalWrite(DC_1_IN1, LOW);
+            digitalWrite(DC_1_IN2, LOW);
         }
     }
     
+    // LEFT
     if (msg.motor_id == BOTH || msg.motor_id == LEFT) {
-        if (msg.speed > 0) {
+        if (msg.speed > 0) { 
             digitalWrite(DC_2_IN2, LOW);         
             analogWrite(DC_2_IN1, abs_speed);
-        } else if (msg.speed < 0) {
+        } else if (msg.speed < 0) { 
             digitalWrite(DC_2_IN1, LOW);
             analogWrite(DC_2_IN2, abs_speed);
+        } else { 
+            analogWrite(DC_2_IN1, 0);
+            analogWrite(DC_2_IN2, 0);
+            digitalWrite(DC_2_IN1, LOW);
+            digitalWrite(DC_2_IN2, LOW);
         }
     }
 }
